@@ -1,0 +1,17 @@
+# build output
+bin/
+obj/
+publish/
+*.user
+.vs/
+
+# runtime data created next to the program (database, certificates, logs)
+Data/
+adopt.txt
+*.log
+
+# never commit signing keys or personal backups
+*.jks
+*.keystore
+archive/
+apk-signing/

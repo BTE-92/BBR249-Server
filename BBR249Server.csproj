@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <AssemblyName>BBR249Server</AssemblyName>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>annotations</Nullable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <ServerGarbageCollector>true</ServerGarbageCollector>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- les sauvegardes (archive) contiennent d'anciennes copies du code : on ne les compile pas -->
+    <Compile Remove="archive\**" />
+    <EmbeddedResource Remove="archive\**" />
+    <None Remove="archive\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\LocalInitialData.txt" LogicalName="LocalInitialData.txt" />
+    <EmbeddedResource Include="Resources\builder_template.bin" LogicalName="builder_template.bin" />
+    <EmbeddedResource Include="Resources\puzzle_level.bin" LogicalName="puzzle_level.bin" />
+    <EmbeddedResource Include="Resources\seed_levels.json" LogicalName="seed_levels.json" />
+    <EmbeddedResource Include="Resources\puzzle_screenshot.jpg" LogicalName="puzzle_screenshot.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.10" />
+  </ItemGroup>
+</Project>
