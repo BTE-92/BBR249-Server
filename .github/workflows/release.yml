@@ -1,0 +1,71 @@
+name: Release
+
+# Builds the Windows package from the public source and attaches it to a GitHub release.
+# Trigger: push a tag like v1.0.0 (or run it by hand from the Actions tab and give a tag name).
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (for example v1.0.1)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish (single file, self-contained)
+        shell: pwsh
+        run: >
+          dotnet publish BBR249Server.csproj -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $tag = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME } else { '${{ github.event.inputs.tag }}' }
+          echo "TAG=$tag" >> $env:GITHUB_ENV
+          $dir = "BBR249Server-$tag-win-x64"
+          New-Item -ItemType Directory -Path $dir | Out-Null
+          Copy-Item publish/BBR249Server.exe $dir/
+          Copy-Item "scripts/Start BBR249Server.bat" $dir/
+          @"
+          BBR 2.4.9 Offline Server $tag
+
+          1. Run "Start BBR249Server.bat" (it asks for Administrator rights: the server needs ports 53, 80 and 443).
+          2. Keep the window open while you play. A "Data" folder (database, log, certificates) is created next to the program.
+          3. Connect the game: see https://github.com/BTE-92/BBR249-Server#connecting-a-client
+
+          Source code, options and troubleshooting: https://github.com/BTE-92/BBR249-Server
+          Fan-made, not affiliated with Traplight. Contains no game files.
+          "@ | Set-Content -Path "$dir/README.txt"
+          Compress-Archive -Path $dir -DestinationPath "$dir.zip"
+          $hash = (Get-FileHash "$dir.zip" -Algorithm SHA256).Hash.ToLower()
+          "$hash  $dir.zip" | Set-Content -Path "$dir.zip.sha256"
+          echo "ZIP=$dir.zip" >> $env:GITHUB_ENV
+          echo "SHA=$hash" >> $env:GITHUB_ENV
+
+      - name: Create the release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $notes = @"
+          Windows build of the BBR 2.4.9 offline server, built by GitHub Actions from the source at this tag.
+
+          **SHA-256** of the zip: ``$env:SHA``
+
+          Windows may show a SmartScreen warning because the program is not code-signed. It starts a small DNS server (port 53) and creates its own local certificate authority, which some antivirus programs flag; you can check the zip's hash above and build it yourself from the source (see the README).
+          "@
+          gh release create $env:TAG $env:ZIP "$env:ZIP.sha256" --title "BBR 2.4.9 Offline Server $env:TAG" --notes $notes --verify-tag
