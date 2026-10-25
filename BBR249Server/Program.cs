@@ -16,6 +16,7 @@ using BBR249Server.Data;
 using BBR249Server.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -308,6 +309,7 @@ public static class Program
 			});
 		});
 		WebApplication app = webApplicationBuilder.Build();
+		app.Use((HttpContext http, Func<Task> next) => Cors.Handle(http, next));
 		app.Run(Router.Handle);
 		try
 		{

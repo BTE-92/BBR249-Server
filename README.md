@@ -44,6 +44,7 @@ own network: levels, scores, ghosts, the level builder, friends, challenges and 
 - **Friend races**: new players automatically become friends with everyone on the server. The window has a
   "Challenge a player" tool (the original client has no button for it).
 - **Level import / export** as `.zip` (`/v1/minigame/export` and `/import`).
+- **CORS** for browser clients (for example a WebGL build of the game): the server answers the browser's `OPTIONS` preflight, allows any origin, and exposes the response headers the game reads (`PLAY_STATUS`, `PLAY_HASH`, `FILE_SIZES`, `GHOST_*`). Requests without an `Origin` header (the native game) are unchanged.
 - **LAN discovery**: patched Android clients find the server by themselves, no DNS or certificate needed.
 - **Own certificate authority** generated on first run, for clients that need HTTPS (iOS, unpatched Android).
 
@@ -160,6 +161,7 @@ the logic is the same.
 - **"Connection error" after restarting the server**: the device may have fallen back to the router's DNS; toggle
   Wi-Fi off and on, and keep the server running while playing.
 - **Leftover proxy**: a Wi-Fi proxy sends all of the game's traffic to the wrong place.
+- **WebGL build blocked by the browser**: a page served over `https://` cannot call this plain `http://` server (mixed content); serve the page over `http://` or use a certificate your browser trusts for the HTTPS port. Also set the game's base URL to the PC's address.
 - **Music**: the downloadable music tracks no longer exist, so races play the built-in ones.
 
 ## Credits
