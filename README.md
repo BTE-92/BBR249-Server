@@ -166,7 +166,6 @@ the logic is the same.
 
 ## Credits
 
-Big Bang Racing is a game by Traplight. This project is a fan-made server by [BTE-92](https://github.com/BTE-92),
-developed together with Claude (Anthropic). It builds on community decompilation work on the game, including
+Big Bang Racing is a game by Traplight. This project is a fan-made server by [BTE-92](https://github.com/BTE-92). It builds on community decompilation work on the game, including
 [Dodonickey's decompile](https://github.com/Dodonickey/Big-Bang-Decompiled). No license has been chosen yet:
 until the author adds one, all rights are reserved.
